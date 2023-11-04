@@ -73,13 +73,14 @@ loadCSVFiles();
 function searchCSV(searchText) {
 	searchGuangyun(searchText);
 	searchWangsan(searchText);
-	searchYunjing(searchText);
 }
 
 function searchGuangyun(searchText) {
 	if (guangyunData) {
             const results = [];
-
+				const xiaoyuns = [];
+				let haveSearchedYunjing = false;
+				
             for (let i = 0; i < guangyunData.length; i++) {
                 const line = guangyunData[i].split(',');
                 let weight = -1;
@@ -111,7 +112,7 @@ function searchGuangyun(searchText) {
                         headOri = firstGroupItem[6];
                         head = firstGroupItem[7];
                     }
-
+					
                     results.push({
                         line: line,
                         weight: weight,
@@ -119,24 +120,39 @@ function searchGuangyun(searchText) {
                         head: head,
                     });
 					
-					//小韻
-					if(headOri.includes(searchText) || (head.includes(searchText) && head !== '')){
-results.push(...guangyunData
+					//小韻 (搜索项为小韵首字时显示该小韵所有项)
+					if(weight === 0 &&( headOri.includes(searchText) || (head.includes(searchText) && head !== ''))){
+						haveSearchedYunjing = searchYunjing(searchText, true);
+						
+results.push(
+  ...guangyunData
     .slice(i)
     .filter((item) => item.startsWith(groupNumber) && item.split(',')[6] !== headOri)
-    .map((item) => ({
-        line: item.split(','),
+    .map((item) => {
+      const l = item.split(',');
+
+      if (!haveSearchedYunjing) {
+        haveSearchedYunjing = searchYunjing(l[7] === '' ? l[6] : l[7], false);
+      }
+
+      return {
+        line: l,
         weight: 1,
         headOri: headOri,
         head: head,
-    })));
+      };
+    })
+);
+	
+	xiaoyuns.push(headOri);
 
 						
 					}
                 }
             }
 
-            results.sort((a, b) => a.weight - b.weight);
+            results.filter((a) => a.weight === 0 || a.weight === 1 || !xiaoyuns.includes(a.headOri)) //去除其他搜索和小韵搜索重叠的部分
+				.sort((a, b) => a.weight - b.weight);
 
             const guangyunDiv = document.getElementById("guangyun");
             guangyunDiv.innerHTML = "";
@@ -429,18 +445,19 @@ function splitGuangyunDiwei(text) {
 	    const tones = Object.keys(toneMap);
 		const weis = Object.keys(weiMap);
 	  
-function searchYunjing(searchText) {
+function searchYunjing(searchText, isSearchText) {
   const yunjingSearch = document.getElementById("yunjingSearch");
   for (let i = 0; i < yunjingData.length; i++) {
     const data = yunjingData[i].split(',');
     if (data[0] === searchText) {
       const page = Number(data[1]);
-	  yunjingSearch.textContent = `${searchText}：${titles[page-1]} ${weis[Number(data[3])-1]} ${data[4]}聲 ${data[5]}韻 ${data[6]}等`;
+	  yunjingSearch.textContent = `${isSearchText ? '' : "【同小韵字】"}${searchText}：${titles[page-1]} ${weis[Number(data[3])-1]} ${data[4]}聲 ${data[5]}韻 ${data[6]}等`;
       displayYunjing(page, searchText);
-      return;
+      return true;
     }
   }
   yunjingSearch.textContent = "未找到";
+  return false;
 }
 
 function displayYunjing(page,searchText) {
