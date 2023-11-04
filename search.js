@@ -468,7 +468,10 @@ function searchYunjing(searchText, isSearchText) {
 				
 		  				 lingjianA.addEventListener("click", function () {
 							 yunjingSearch.textContent = `${isSearchText ? '' : "【同小韵字】"}${searchText}：${titles[page-1]} ${weis[Number(data[3])-1]} ${data[4]}聲 ${data[5]}韻 ${data[6]}等`;
-								   yunjingSearch.appendChild(...lingjianAs.filter((a) => a.id != page));
+								   const otherA = lingjianAs.filter((a) => a.id != page);
+								   if(otherA.length>0){
+								   yunjingSearch.appendChild(...otherA);
+								   }
 								   displayYunjing(page, searchText);
     });
 	lingjianAs.push(lingjianA);
