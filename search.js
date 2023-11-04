@@ -106,13 +106,6 @@ if (yunjingDataOri[yunjingDataOri.length - 1].trim() === '') {
 	  
       if (toneA < toneB) return -1;
       if (toneA > toneB) return 1;
-	  
-      const dengMap = {
-        '一': 1,
-        '二': 2,
-        '三': 3,
-        '四': 4,
-      };
 
       return dengMap[a[4]] - dengMap[b[4]];
     });
@@ -406,7 +399,13 @@ function splitGuangyunDiwei(text) {
 
   const titles = ["內轉第一開", "內轉第二開合", "外轉第三開合", "內轉第四開合", "內轉第五合", "內轉第六開", "內轉第七合", "內轉第八開", "內轉第九開", "內轉第十合", "內轉第十一開", "內轉第十二開合", "外轉第十三開", "外轉第十四合", "外轉第十五開", "外轉第十六合", "外轉第十七開", "外轉第十八合", "外轉第十九開", "外轉第二十合", "外轉第二十一開", "外轉第二十二合", "外轉第二十三開", "外轉第二十四合", "外轉第二十五開", "外轉第二十六合", "外轉第二十七合", "內轉第二十八合", "內轉第二十九開", "外轉第三十合", "內轉第三十一開", "內轉第三十二合", "外轉第三十三開", "外轉第三十四合", "外轉第三十五開", "外轉第三十六合", "內轉第三十七開", "內轉第三十八合", "外轉第三十九開", "外轉第四十合", "外轉第四十一合", "內轉第四十二開", "內轉第四十三合"];
   const tones = ['平', '上', '去', '入'];
-
+      const dengMap = {
+        '一': 1,
+        '二': 2,
+        '三': 3,
+        '四': 4,
+      };
+	  
 function searchYunjing(searchText) {
   const yunjingSearch = document.getElementById("yunjingSearch");
   for (let i = 0; i < yunjingData.length; i++) {
@@ -463,7 +462,7 @@ currentPage = page;
 
     for (let j = 1; j < 24; j++) {
       const cell = document.createElement('td');
-      if (lines.length === 0 || lines[0].split(',')[3] != j) {
+      if (lines.length === 0 || lines[0].split(',')[3] != j || dengMap[lines[0].split(',')[6]] !== i % 4 + 1) {
         cell.textContent = '◯';
       } else {
         cell.textContent = lines[0].split(',')[0];
