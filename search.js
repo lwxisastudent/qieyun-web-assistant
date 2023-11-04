@@ -208,9 +208,14 @@ function searchGuangyun(searchText) {
                 ziDiv.innerHTML = `<p><span><ruby>${line[6]}<rt>${line[7]}</rt></ruby></span></p>`;
 					}
                 itemDiv.appendChild(ziDiv);
-				
 								if(result.weight === 0){
 					ziDiv.querySelector('p').classList.add("text-match");
+				}else{
+				 ziDiv.querySelector('p').innerHTML = `<a href="javascript:void(0);">${ziDiv.querySelector('p').innerHTML}</a>`;
+				 ziDiv.querySelector('p').addEventListener("click", function () {
+            searchInput.value = line[7] === "" ? line[6] : line[7];
+            searchButton.click();
+    });
 				}
 				
                 const fanqieP = document.createElement("p");
@@ -318,9 +323,14 @@ if(searchText !== '〈'){
                 ziDiv.className = "item-zi";
                 ziDiv.innerHTML = `<p>${line[12]}</p>`;
                 itemDiv.appendChild(ziDiv);
-				
 								if(result.weight === 0){
 					ziDiv.querySelector('p').classList.add("text-match");
+				}else{
+				 ziDiv.querySelector('p').innerHTML = `<a href="javascript:void(0);">${ziDiv.querySelector('p').innerHTML}</a>`;
+				 ziDiv.querySelector('p').addEventListener("click", function () {
+            searchInput.value = line[12];
+            searchButton.click();
+    });
 				}
 				
                 const fanqieP = document.createElement("p");

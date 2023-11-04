@@ -110,6 +110,11 @@
 	font-weight: bold;
 }
 
+.item-zi a {
+    text-decoration: none;
+    color: black;
+}
+
 .item-fanqie {
 	margin-left: 5px;
 	font-weight: normal!important;
