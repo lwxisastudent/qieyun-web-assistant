@@ -110,16 +110,16 @@ function searchGuangyun(searchText) {
                 let weight = -1;
 				
 				//字
-                if (line[6] === searchText) {
+                if (line[6].includes(searchText) ||(line[7] === searchText && line[7]!=='')) {
                     weight = 0;
-                }
-				//释义
-				else if (!onlyZiCheckbox.checked && (line[8].includes(searchText) || line[9].includes(searchText))) {
-                    weight = 1;
                 }
 				//反切
 				else if (!onlyZiCheckbox.checked && (line[4].includes(searchText) || line[5].includes(searchText))) {
                     weight = 2;
+                }
+				//释义
+				else if (!onlyZiCheckbox.checked && (line[8].includes(searchText) || line[9].includes(searchText))) {
+                    weight = 3;
                 }
 
                 if (weight >= 0) {
@@ -131,7 +131,7 @@ function searchGuangyun(searchText) {
                     let headOri = line[6];
                     let head = line[7];
 
-                    if (groupItems.length > 0) { //小韵字头
+                    if (groupItems.length > 0) { //数据中没有小韵字头，需要先寻找
                         const firstGroupItem = groupItems[0].split(',');
                         headOri = firstGroupItem[6];
                         head = firstGroupItem[7];
@@ -143,6 +143,21 @@ function searchGuangyun(searchText) {
                         headOri: headOri,
                         head: head,
                     });
+					
+					//小韻
+					if(headOri.includes(searchText) || (head.includes(searchText) && head !== '')){
+results.push(...guangyunData
+    .slice(i)
+    .filter((item) => item.startsWith(groupNumber) && item.split(',')[6] !== headOri)
+    .map((item) => ({
+        line: item.split(','),
+        weight: 1,
+        headOri: headOri,
+        head: head,
+    })));
+
+						
+					}
                 }
             }
 
@@ -250,12 +265,17 @@ if(searchText !== '〈'){
                 const line = wangsanData[i].split(',');
                 let weight = -1;
 
-                if (line[12] === searchText) {
+                if (line[12].includes(searchText)) {
                     weight = 0;
-                } else if (line[12].includes(searchText) || (!onlyZiCheckbox.checked && line[13].includes(searchText))) {
+                }
+				//小韻
+				 else if (!onlyZiCheckbox.checked && line[7].includes(searchText)) {
                     weight = 1;
-                } else if (!onlyZiCheckbox.checked && line[8].includes(searchText) && searchText !== "反") {
+                }
+				else if (!onlyZiCheckbox.checked && line[8].includes(searchText) && searchText !== "反") {
                     weight = 2;
+                } else if (line[12].includes(searchText) || (!onlyZiCheckbox.checked && line[13].includes(searchText))) {
+                    weight = 3;
                 }
 
                 if (weight >= 0) {
@@ -485,7 +505,6 @@ currentPage = page;
 		if(searchText !== "" && searchText === cell.textContent){
 			cell.className="text-match";
 		}
-	  console.log(lines[0]);
         lines.shift();
       }
       tr.appendChild(cell);
