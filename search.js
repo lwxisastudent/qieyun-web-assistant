@@ -77,7 +77,7 @@ function searchCSV(searchText) {
 
 function searchGuangyun(searchText) {
 	if (guangyunData) {
-            const results = [];
+            let results = [];
 				const xiaoyuns = [];
 				let haveSearchedYunjing = false;
 				
@@ -151,8 +151,8 @@ results.push(
                 }
             }
 
-            results.filter((a) => a.weight === 0 || a.weight === 1 || !xiaoyuns.includes(a.headOri)) //去除其他搜索和小韵搜索重叠的部分
-				.sort((a, b) => a.weight - b.weight);
+            results = results.filter((a) => a.weight === 0 || a.weight === 1 || !xiaoyuns.includes(a.headOri))
+				.sort((a, b) => a.weight - b.weight); //去除其他搜索和小韵搜索重叠的部分
 
             const guangyunDiv = document.getElementById("guangyun");
             guangyunDiv.innerHTML = "";
