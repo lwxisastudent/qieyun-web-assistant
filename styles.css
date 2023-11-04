@@ -44,6 +44,12 @@
     display: block;
 }
 
+.text-match{
+	color: red;
+	font-style: italic;
+	text-decoration: underline;
+}
+
 #guangyun .item {
 	background-color: #80bcf03d;
 }
@@ -124,4 +130,50 @@
 
 ul {
     list-style: none;
+}
+
+#yunjingTable {
+	width: 100%;
+    font-size: 1.5rem;
+}
+
+td {
+	padding:.3rem;
+}
+
+.table-rowhead-manner th {
+	width: 1rem;
+}
+
+.table-topline td {
+  border-top: 1px solid #ccc;
+}
+
+.table-colhead span {
+	    border-radius: 0.5rem;
+    background-color: gray;
+    padding: 0.1rem 0.3rem;
+}
+
+#pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: #2196F3;
+}
+
+.page-button[disabled] {
+  color: gray;
+}
+
+#page-number {
+  font-size: 18px;
+  margin: 0 20px;
 }

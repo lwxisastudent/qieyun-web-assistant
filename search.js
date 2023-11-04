@@ -1,7 +1,129 @@
 //使用数据:
 //https://github.com/nk2028/qieyun-data
 
+var guangyunData,wangsanData,yunjingData;
 const onlyZiCheckbox = document.getElementById("onlyZiCheckbox");
+const dependOnWangsanCheckbox = document.getElementById("dependOnWangsanCheckbox");
+
+function loadCSVFiles() {
+  const guangyunXhr = new XMLHttpRequest();
+  guangyunXhr.open("GET", "guangyun.csv", true);
+  guangyunXhr.onload = function () {
+    if (guangyunXhr.status === 200) {
+		guangyunData = guangyunXhr.responseText.split('\n');
+guangyunData.shift();
+if (guangyunData[guangyunData.length - 1].trim() === '') {
+    guangyunData.pop();
+}
+    }
+  };
+  guangyunXhr.send();
+
+  const wangsanXhr = new XMLHttpRequest();
+  wangsanXhr.open("GET", "wangsan.csv", true);
+  wangsanXhr.onload = function () {
+    if (wangsanXhr.status === 200) {
+      let wangsan = wangsanXhr.responseText;
+    wangsan = wangsan.replace(/〻〈/g, '');
+    wangsan = wangsan.replace(/〉/g, '');
+    wangsan = wangsan.replace(/【〻】/g, '？');
+	
+			
+            wangsanData = wangsan.split('\n');
+wangsanData.shift();
+if (wangsanData[wangsanData.length - 1].trim() === '') {
+    wangsanData.pop();
+}
+
+    }
+  };
+  wangsanXhr.send();
+  
+  const yunjingXhr = new XMLHttpRequest();
+  yunjingXhr.open("GET", "yunjing-gycs.csv", true);
+  yunjingXhr.onload = function () {
+    if (yunjingXhr.status === 200) {
+      let yunjing = yunjingXhr.responseText;
+	  const replacements = {
+  "舌齒音第二位": "1",
+  "舌齒音第一位": "2",
+  "喉音第四位": "3",
+  "喉音第三位": "4",
+  "喉音第二位": "5",
+  "喉音第一位": "6",
+  "齒音第五位": "7",
+  "齒音第四位": "8",
+  "齒音第三位": "9",
+  "齒音第二位": "10",
+  "齒音第一位": "11",
+  "牙音第四位": "12",
+  "牙音第三位": "13",
+  "牙音第二位": "14",
+  "牙音第一位": "15",
+  "舌音第四位": "16",
+  "舌音第三位": "17",
+  "舌音第二位": "18",
+  "舌音第一位": "19",
+  "脣音第四位": "20",
+  "脣音第三位": "21",
+  "脣音第二位": "22",
+  "脣音第一位": "23"
+};
+
+for (const key in replacements) {
+  const regex = new RegExp(key, "g");
+  yunjing = yunjing.replace(regex, replacements[key]);
+}
+
+let yunjingDataOri = yunjing.split('\n');
+yunjingDataOri.shift();
+if (yunjingDataOri[yunjingDataOri.length - 1].trim() === '') {
+    yunjingDataOri.pop();
+}
+
+  yunjingData = yunjingDataOri.sort((a, b) => {
+	  const pageA = Number(a[1]);
+	  const pageB = Number(b[1]);
+
+      if (pageA < pageB) return -1;
+      if (pageA > pageB) return 1;
+
+      const shengmuA = Number(a[3]);
+      const shengmuB = Number(b[3]);
+
+      if (shengmuA < shengmuB) return -1;
+      if (shengmuA > shengmuB) return 1;
+
+      const toneMap = {
+        '平': 1,
+        '上': 2,
+        '去': 3,
+        '入': 4,
+      };
+	  
+      const toneA = toneMap[a[4]];
+      const toneB = toneMap[b[4]];
+	  
+      if (toneA < toneB) return -1;
+      if (toneA > toneB) return 1;
+	  
+      const dengMap = {
+        '一': 1,
+        '二': 2,
+        '三': 3,
+        '四': 4,
+      };
+
+      return dengMap[a[4]] - dengMap[b[4]];
+    });
+	
+displayYunjing(currentPage,"");
+    }
+  };
+  yunjingXhr.send();
+}
+
+loadCSVFiles();
 
 function searchCSV(searchText) {
 	searchGuangyun(searchText);
@@ -9,19 +131,11 @@ function searchCSV(searchText) {
 }
 
 function searchGuangyun(searchText) {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "guangyun.csv", true);
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            const lines = xhr.responseText.split('\n');
-lines.shift();
-if (lines[lines.length - 1].trim() === '') {
-    lines.pop();
-}
+	if (guangyunData) {
             const results = [];
 
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].split(',');
+            for (let i = 0; i < guangyunData.length; i++) {
+                const line = guangyunData[i].split(',');
                 let weight = -1;
 				
 				//字
@@ -39,7 +153,7 @@ if (lines[lines.length - 1].trim() === '') {
 
                 if (weight >= 0) {
                     const groupNumber = line[0]+",";
-                    const groupItems = lines
+                    const groupItems = guangyunData
                         .slice(1, i)
                         .filter((item) => item.startsWith(groupNumber));
 
@@ -58,6 +172,10 @@ if (lines[lines.length - 1].trim() === '') {
                         headOri: headOri,
                         head: head,
                     });
+					
+					if(!dependOnWangsanCheckbox.checked && weight === 0){
+						searchYunjing(head === "" ? headOri : head);
+					}
                 }
             }
 
@@ -116,6 +234,10 @@ if (lines[lines.length - 1].trim() === '') {
 					}
                 itemDiv.appendChild(ziDiv);
 				
+								if(result.weight === 0){
+					ziDiv.querySelector('p').classList.add("text-match");
+				}
+				
                 const fanqieP = document.createElement("p");
                 fanqieP.className = "item-fanqie qie";
 				if(line[5] === ""){
@@ -138,31 +260,13 @@ if (lines[lines.length - 1].trim() === '') {
 				}
             }
         }
-    };
-
-    xhr.send();
 }
 
 function searchWangsan(searchText) {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "wangsan.csv", true);
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-			let wangsan = xhr.responseText;
-    wangsan = wangsan.replace(/〻〈/g, '');
-    wangsan = wangsan.replace(/〉/g, '');
-    wangsan = wangsan.replace(/【〻】/g, '？');
-			
-            const lines = wangsan.split('\n');
-lines.shift();
-if (lines[lines.length - 1].trim() === '') {
-    lines.pop();
-}
-
             const results = [];
 
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].split(',');
+            for (let i = 0; i < wangsanData.length; i++) {
+                const line = wangsanData[i].split(',');
                 let weight = -1;
 
                 if (line[12] === searchText) {
@@ -175,6 +279,10 @@ if (lines[lines.length - 1].trim() === '') {
 
                 if (weight >= 0) {
                     results.push({ line: line, weight: weight });
+					
+					if(dependOnWangsanCheckbox.checked && weight === 0){
+						searchYunjing(line[7]);
+					}
                 }
             }
 
@@ -230,6 +338,10 @@ if (lines[lines.length - 1].trim() === '') {
                 ziDiv.innerHTML = `<p>${line[12]}</p>`;
                 itemDiv.appendChild(ziDiv);
 				
+								if(result.weight === 0){
+					ziDiv.querySelector('p').classList.add("text-match");
+				}
+				
                 const fanqieP = document.createElement("p");
                 fanqieP.className = "item-fanqie";
                 fanqieP.textContent = line[8];
@@ -240,11 +352,7 @@ if (lines[lines.length - 1].trim() === '') {
                 shiP.textContent = line[13];
                 itemDiv.appendChild(shiP);
             }
-        }
-    };
-
-    xhr.send();
-}
+	}
 
 function splitDiwei(text) {
     const regex = /(.*?)([一二三四]?)(.)([^一二三四]*)$/;
@@ -284,4 +392,119 @@ function splitGuangyunDiwei(text) {
         shengdiao: "",
         yunmu: ""
     };
+}
+
+  const titles = ["內轉第一開", "內轉第二開合", "外轉第三開合", "內轉第四開合", "內轉第五合", "內轉第六開", "內轉第七合", "內轉第八開", "內轉第九開", "內轉第十合", "內轉第十一開", "內轉第十二開合", "外轉第十三開", "外轉第十四合", "外轉第十五開", "外轉第十六合", "外轉第十七開", "外轉第十八合", "外轉第十九開", "外轉第二十合", "外轉第二十一開", "外轉第二十二合", "外轉第二十三開", "外轉第二十四合", "外轉第二十五開", "外轉第二十六合", "外轉第二十七合", "內轉第二十八合", "內轉第二十九開", "外轉第三十合", "內轉第三十一開", "內轉第三十二合", "外轉第三十三開", "外轉第三十四合", "外轉第三十五開", "外轉第三十六合", "內轉第三十七開", "內轉第三十八合", "外轉第三十九開", "外轉第四十合", "外轉第四十一合", "內轉第四十二開", "內轉第四十三合"];
+  const tones = ['平', '上', '去', '入'];
+
+function searchYunjing(searchText) {
+  const yunjingSearch = document.getElementById("yunjingSearch");
+  for (let i = 0; i < yunjingData.length; i++) {
+    const data = yunjingData[i].split(',');
+    if (data[0] === searchText) {
+      const page = Number(data[1]);
+	  yunjingSearch.textContent = `${searchText}：${titles[page-1]} ${data[3]} ${data[4]}聲 ${data[6]}等 ${data[5]}小韻`;
+      displayYunjing(page, searchText);
+      return;
+    }
+  }
+  yunjingSearch.textContent = "未找到";
+}
+
+function displayYunjing(page,searchText) {
+  if (page > 43)
+    return;
+
+currentPage = page;
+    updatePageButtons();
+	
+  const lines = yunjingData.filter(row => row.split(',')[1] == page);
+
+  const yunjingTitle = document.getElementById("yunjingTitle");
+  if(lines.length !== 0 && lines[0].split(',')[2] !== ""){ //开合修正
+	  const regex = /(開合|開|合)/;
+  const match = titles[page - 1].match(regex);
+  if (match) {
+    const zhuan = titles[page - 1].split(match[0])[0];
+	yunjingTitle.innerHTML = `${zhuan}<span><ruby>${match[0]}<rt>${lines[0].split(',')[2]}</rt></ruby></span>`;
+  }
+  }else{
+  yunjingTitle.textContent = titles[page - 1];
+  }
+  
+  const yunjingTable = document.getElementById('yunjingTable');
+  yunjingTable.innerHTML = '<thead class="table-rowhead"><tr class="table-rowhead-place"><th></th><th colspan="2">舌齒音</th><th colspan="4">喉音</th><th colspan="5">齒音</th><th colspan="4">牙音</th><th colspan="4">舌音</th><th colspan="4">唇音</th><tr class="table-rowhead-manner"><th></th><th>清濁</th><th>清濁</th><th>清濁</th><th>濁</th><th>清</th><th>清</th><th>濁</th><th>清</th><th>濁</th><th>次清</th><th>清</th><th>清濁</th><th>濁</th><th>次清</th><th>清</th><th>清濁</th><th>濁</th><th>次清</th><th>清</th><th>清濁</th><th>濁</th><th>次清</th><th>清</th></tr></tr></thead>';
+
+  const tbody = document.createElement('tbody');
+  for (let i = 0; i < 16; i++) {
+    const tr = document.createElement('tr');
+    if (i % 4 === 0) {
+      tr.className = "table-topline";
+      const sd = document.createElement('td');
+      sd.className = "table-colhead";
+      sd.rowSpan = 4;
+	  if(lines.length !== 0){
+      sd.innerHTML = `<span>${lines[0].split(',')[5]}</span>`;
+	  }else{
+		  sd.innerHTML =tones[i/4];
+	  }
+      tr.appendChild(sd);
+    }
+
+    for (let j = 1; j < 24; j++) {
+      const cell = document.createElement('td');
+      if (lines.length === 0 || lines[0].split(',')[3] != j) {
+        cell.textContent = '◯';
+      } else {
+        cell.textContent = lines[0].split(',')[0];
+		if(searchText !== "" && searchText === cell.textContent){
+			cell.className="text-match";
+		}
+        lines.shift();
+      }
+      tr.appendChild(cell);
+    }
+
+    tbody.appendChild(tr);
+  }
+
+  yunjingTable.appendChild(tbody);
+}
+
+let currentPage = 1;
+
+document.getElementById("prev-page").addEventListener("click", () => {
+  if (currentPage > 1) {
+  const yunjingSearch = document.getElementById("yunjingSearch");
+  yunjingSearch.textContent = '';
+    displayYunjing(currentPage+1,"");
+  }
+});
+
+document.getElementById("next-page").addEventListener("click", () => {
+  if (currentPage < 43) {
+  const yunjingSearch = document.getElementById("yunjingSearch");
+  yunjingSearch.textContent = '';
+    displayYunjing(currentPage+1,"");
+  }
+});
+
+function updatePageButtons() {
+  const prevButton = document.getElementById("prev-page");
+  const nextButton = document.getElementById("next-page");
+  const pageNumber = document.getElementById("page-number");
+
+  pageNumber.textContent = currentPage;
+
+  if (currentPage === 1) {
+    prevButton.disabled = true;
+  } else {
+    prevButton.disabled = false;
+  }
+
+  if (currentPage === 43) {
+    nextButton.disabled = true;
+  } else {
+    nextButton.disabled = false;
+  }
 }
