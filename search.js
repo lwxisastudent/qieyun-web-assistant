@@ -477,7 +477,7 @@ document.getElementById("prev-page").addEventListener("click", () => {
   if (currentPage > 1) {
   const yunjingSearch = document.getElementById("yunjingSearch");
   yunjingSearch.textContent = '';
-    displayYunjing(currentPage+1,"");
+    displayYunjing(currentPage-1,"");
   }
 });
 
