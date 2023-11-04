@@ -223,7 +223,7 @@ function searchGuangyun(searchText) {
 				if(line[5] === ""){
                 fanqieP.textContent = line[4];
 					}else{
-                fanqieP.textContent = `<span><ruby>${line[4]}<rt>${line[5]}</rt></ruby></span>`;
+                fanqieP.innerHTML = `<span><ruby>${line[4]}<rt>${line[5]}</rt></ruby></span>`;
 					}
                 ziDiv.appendChild(fanqieP);
 
