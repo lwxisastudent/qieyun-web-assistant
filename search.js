@@ -403,7 +403,7 @@ function searchYunjing(searchText) {
     const data = yunjingData[i].split(',');
     if (data[0] === searchText) {
       const page = Number(data[1]);
-	  yunjingSearch.textContent = `${searchText}：${titles[page-1]} ${data[3]} ${data[4]}聲 ${data[6]}等 ${data[5]}小韻`;
+	  yunjingSearch.textContent = `${searchText}：${titles[page-1]} ${data[3]} ${data[4]}聲 ${data[5]}韻 ${data[6]}等`;
       displayYunjing(page, searchText);
       return;
     }
