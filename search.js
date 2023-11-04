@@ -44,35 +44,10 @@ if (wangsanData[wangsanData.length - 1].trim() === '') {
   yunjingXhr.onload = function () {
     if (yunjingXhr.status === 200) {
       let yunjing = yunjingXhr.responseText;
-	  const replacements = {
-  "舌齒音第二位": "1",
-  "舌齒音第一位": "2",
-  "喉音第四位": "3",
-  "喉音第三位": "4",
-  "喉音第二位": "5",
-  "喉音第一位": "6",
-  "齒音第五位": "7",
-  "齒音第四位": "8",
-  "齒音第三位": "9",
-  "齒音第二位": "10",
-  "齒音第一位": "11",
-  "牙音第四位": "12",
-  "牙音第三位": "13",
-  "牙音第二位": "14",
-  "牙音第一位": "15",
-  "舌音第四位": "16",
-  "舌音第三位": "17",
-  "舌音第二位": "18",
-  "舌音第一位": "19",
-  "脣音第四位": "20",
-  "脣音第三位": "21",
-  "脣音第二位": "22",
-  "脣音第一位": "23"
-};
 
-for (const key in replacements) {
+for (const key in weiMap) {
   const regex = new RegExp(key, "g");
-  yunjing = yunjing.replace(regex, replacements[key]);
+  yunjing = yunjing.replace(regex, weiMap[key]);
 }
 
 let yunjingDataOri = yunjing.split('\n');
@@ -414,8 +389,31 @@ function splitGuangyunDiwei(text) {
 }
 
   const titles = ["內轉第一開", "內轉第二開合", "外轉第三開合", "內轉第四開合", "內轉第五合", "內轉第六開", "內轉第七合", "內轉第八開", "內轉第九開", "內轉第十合", "內轉第十一開", "內轉第十二開合", "外轉第十三開", "外轉第十四合", "外轉第十五開", "外轉第十六合", "外轉第十七開", "外轉第十八合", "外轉第十九開", "外轉第二十合", "外轉第二十一開", "外轉第二十二合", "外轉第二十三開", "外轉第二十四合", "外轉第二十五開", "外轉第二十六合", "外轉第二十七合", "內轉第二十八合", "內轉第二十九開", "外轉第三十合", "內轉第三十一開", "內轉第三十二合", "外轉第三十三開", "外轉第三十四合", "外轉第三十五開", "外轉第三十六合", "內轉第三十七開", "內轉第三十八合", "外轉第三十九開", "外轉第四十合", "外轉第四十一合", "內轉第四十二開", "內轉第四十三合"];
-  const tones = ['平', '上', '去', '入'];
-  
+	  const weiMap = {
+  "舌齒音第二位": "1",
+  "舌齒音第一位": "2",
+  "喉音第四位": "3",
+  "喉音第三位": "4",
+  "喉音第二位": "5",
+  "喉音第一位": "6",
+  "齒音第五位": "7",
+  "齒音第四位": "8",
+  "齒音第三位": "9",
+  "齒音第二位": "10",
+  "齒音第一位": "11",
+  "牙音第四位": "12",
+  "牙音第三位": "13",
+  "牙音第二位": "14",
+  "牙音第一位": "15",
+  "舌音第四位": "16",
+  "舌音第三位": "17",
+  "舌音第二位": "18",
+  "舌音第一位": "19",
+  "脣音第四位": "20",
+  "脣音第三位": "21",
+  "脣音第二位": "22",
+  "脣音第一位": "23"
+};
       const toneMap = {
         '平': 1,
         '上': 2,
@@ -428,6 +426,8 @@ function splitGuangyunDiwei(text) {
         '三': 3,
         '四': 4,
       };
+	    const tones = Object.keys(toneMap);
+		const weis = Object.keys(weiMap);
 	  
 function searchYunjing(searchText) {
   const yunjingSearch = document.getElementById("yunjingSearch");
@@ -435,7 +435,7 @@ function searchYunjing(searchText) {
     const data = yunjingData[i].split(',');
     if (data[0] === searchText) {
       const page = Number(data[1]);
-	  yunjingSearch.textContent = `${searchText}：${titles[page-1]} ${data[3]} ${data[4]}聲 ${data[5]}韻 ${data[6]}等`;
+	  yunjingSearch.textContent = `${searchText}：${titles[page-1]} ${weis[Number(data[3])-1]} ${data[4]}聲 ${data[5]}韻 ${data[6]}等`;
       displayYunjing(page, searchText);
       return;
     }
