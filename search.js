@@ -265,13 +265,14 @@ function searchGuangyun(searchText) {
 function searchWangsan(searchText) {
             const results = [];
 
+if(searchText !== '〈'){
             for (let i = 0; i < wangsanData.length; i++) {
                 const line = wangsanData[i].split(',');
                 let weight = -1;
 
                 if (line[12] === searchText) {
                     weight = 0;
-                } else if (!onlyZiCheckbox.checked && line[13].includes(searchText)) {
+                } else if (line[12].includes(searchText) || (!onlyZiCheckbox.checked && line[13].includes(searchText))) {
                     weight = 1;
                 } else if (!onlyZiCheckbox.checked && line[8].includes(searchText) && searchText !== "反") {
                     weight = 2;
@@ -287,6 +288,7 @@ function searchWangsan(searchText) {
             }
 
             results.sort((a, b) => a.weight - b.weight);
+}
 
             const wangsanDiv = document.getElementById("wangsan");
             wangsanDiv.innerHTML = "";
@@ -344,7 +346,15 @@ function searchWangsan(searchText) {
 				
                 const fanqieP = document.createElement("p");
                 fanqieP.className = "item-fanqie";
-                fanqieP.textContent = line[8];
+				                    const fanqie_parts = line[8].split('〈');
+				
+					if(fanqie_parts.length===1){
+                fanqieP.innerHTML = fanqie_parts[0];
+					}else if(fanqie_parts.length===2){
+						const rubyHTML = `<span><ruby>${fanqie_parts[0][fanqie_parts[0].length-1] }<rt>${fanqie_parts[1][0]}</rt></ruby></span>`;
+
+                fanqieP.innerHTML = fanqie_parts[0].slice(0, -1) + rubyHTML + fanqie_parts[1].slice(1);
+}
                 ziDiv.appendChild(fanqieP);
 
                 const shiP = document.createElement("div");
