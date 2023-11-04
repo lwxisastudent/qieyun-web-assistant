@@ -64,14 +64,22 @@
 	</div>
 	</section>
 	
-	<p>数据基于 <a href="https://github.com/nk2028/qieyun-data">nk2028/qieyun-data</a></p>
-
+	<p>數據基於 <a href="https://github.com/nk2028/qieyun-data">nk2028/qieyun-data</a></p>
+	<p>數據包含原貌文本和修正文本，本網站顯示凡例：若有修正則將修正文本置於原貌文本上。</p>
     <script src="search.js"></script>
     <script>
         document.getElementById("searchButton").addEventListener("click", function () {
             const searchText = document.getElementById("searchInput").value;
             searchCSV(searchText);
         });
+		
+		searchInput.addEventListener("keypress", function (event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    const searchText = searchInput.value;
+    searchCSV(searchText);
+  }
+});
     </script>
 </body>
 </html>
