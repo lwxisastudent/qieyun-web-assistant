@@ -447,31 +447,35 @@ function splitGuangyunDiwei(text) {
 	  
 function searchYunjing(searchText, isSearchText) {
 	let pages = [];
+	let lingjianAs = [];
   const yunjingSearch = document.getElementById("yunjingSearch");
   for (let i = 0; i < yunjingData.length; i++) {
     const data = yunjingData[i].split(',');
     if (data[0] === searchText) {
-      const page = Number(data[1]);
-	  pages.push(page);
-	  if(!pages.length !== 1){
-	  yunjingSearch.textContent = `${isSearchText ? '' : "【同小韵字】"}${searchText}：${titles[page-1]} ${weis[Number(data[3])-1]} ${data[4]}聲 ${data[5]}韻 ${data[6]}等`;
-      displayYunjing(page, searchText);
-	  }
+	  pages.push(data);
     }
   }
   
   if(pages.length >0){
 	  
-	  pages.forEach((page)=>{
+	  pages.forEach((data)=>{
+      const page = Number(data[1]);
+	  
                 const lingjianA = document.createElement("a");
 				lingjianA.textContent = page;
 				lingjianA.href = "javascript:void(0);";
+				lingjianA.id = page;
 				
 		  				 lingjianA.addEventListener("click", function () {
-							       displayYunjing(page, searchText);
+							 yunjingSearch.textContent = `${isSearchText ? '' : "【同小韵字】"}${searchText}：${titles[page-1]} ${weis[Number(data[3])-1]} ${data[4]}聲 ${data[5]}韻 ${data[6]}等`;
+								   yunjingSearch.appendChild(...lingjianAs.filter((a) => a.id != page));
+								   displayYunjing(page, searchText);
     });
-								   yunjingSearch.appendChild(lingjianA);
+	lingjianAs.push(lingjianA);
 	  });
+	  
+	  lingjianAs[0].click();
+	  
 	  return true;
   }
   yunjingSearch.textContent = "未找到";
