@@ -3,7 +3,7 @@
 
 var guangyunData,wangsanData,yunjingData;
 const onlyZiCheckbox = document.getElementById("onlyZiCheckbox");
-const dependOnWangsanCheckbox = document.getElementById("dependOnWangsanCheckbox");
+const yjTab = document.getElementById("yj");
 
 function loadCSVFiles() {
   const guangyunXhr = new XMLHttpRequest();
@@ -121,6 +121,7 @@ loadCSVFiles();
 function searchCSV(searchText) {
 	searchGuangyun(searchText);
 	searchWangsan(searchText);
+	searchYunjing(searchText);
 }
 
 function searchGuangyun(searchText) {
@@ -165,10 +166,6 @@ function searchGuangyun(searchText) {
                         headOri: headOri,
                         head: head,
                     });
-					
-					if(!dependOnWangsanCheckbox.checked && weight === 0){
-						searchYunjing(head === "" ? headOri : head);
-					}
                 }
             }
 
@@ -209,14 +206,22 @@ function searchGuangyun(searchText) {
                 yunmuP.innerHTML = line[2];
                 diweiDiv.appendChild(yunmuP);
 				
-				const xiaoyunP = document.createElement("p");
-                xiaoyunP.className = "item-diwei-xiaoyun";
+				const xiaoyunA = document.createElement("a");
+                xiaoyunA.className = "item-diwei-xiaoyun";
+				xiaoyunA.href = "javascript:void(0);";
 				if(result.head === ""){
-                xiaoyunP.innerHTML = result.headOri;
+                xiaoyunA.innerHTML = result.headOri;
 					}else{
-                xiaoyunP.innerHTML = `<span><ruby>${result.headOri}<rt>${result.head}</rt></ruby></span>`;
+                xiaoyunA.innerHTML = `<span><ruby>${result.headOri}<rt>${result.head}</rt></ruby></span>`;
 					}
-                diweiDiv.appendChild(xiaoyunP);
+					
+				let xiaoyun = result.head === "" ? result.headOri : result.head;
+				 xiaoyunA.addEventListener("click", function () {
+            searchInput.value = xiaoyun;
+            searchButton.click();
+			yj.click();
+    });
+                diweiDiv.appendChild(xiaoyunA);
 
                 const ziDiv = document.createElement("div");
                 ziDiv.className = "item-zi";
@@ -273,10 +278,6 @@ if(searchText !== '〈'){
 
                 if (weight >= 0) {
                     results.push({ line: line, weight: weight });
-					
-					if(dependOnWangsanCheckbox.checked && weight === 0){
-						searchYunjing(line[7]);
-					}
                 }
             }
 
@@ -317,16 +318,24 @@ if(searchText !== '〈'){
                 yunmuP.innerHTML = line[6];
                 diweiDiv.appendChild(yunmuP);
 				
-				const xiaoyunP = document.createElement("p");
-                xiaoyunP.className = "item-diwei-xiaoyun";
+				const xiaoyunA = document.createElement("a");
+                xiaoyunA.className = "item-diwei-xiaoyun";
+				xiaoyunA.href = "javascript:void(0);";
                     const xiaoyun_parts = line[7].split('〈');
 				
 					if(xiaoyun_parts.length===1){
-                xiaoyunP.innerHTML = xiaoyun_parts[0];
+                xiaoyunA.innerHTML = xiaoyun_parts[0];
 					}else if(xiaoyun_parts.length===2){
-                xiaoyunP.innerHTML = `<span><ruby>${xiaoyun_parts[0]}<rt>${xiaoyun_parts[1]}</rt></ruby></span>`;
+                xiaoyunA.innerHTML = `<span><ruby>${xiaoyun_parts[0]}<rt>${xiaoyun_parts[1]}</rt></ruby></span>`;
 					}
-                diweiDiv.appendChild(xiaoyunP);
+					
+				let xiaoyun = xiaoyun_parts.length===1 ? xiaoyun_parts[0] : xiaoyun_parts[1];
+				 xiaoyunA.addEventListener("click", function () {
+            searchInput.value = xiaoyun;
+            searchButton.click();
+			yj.click();
+    });
+                diweiDiv.appendChild(xiaoyunA);
 
                 const ziDiv = document.createElement("div");
                 ziDiv.className = "item-zi";
