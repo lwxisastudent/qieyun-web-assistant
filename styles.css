@@ -137,6 +137,14 @@ ul {
     list-style: none;
 }
 
+#yunjingSearch a {
+    margin-left: 0.5rem;
+}
+
+#yunjingSearch a:before {
+    content: "见于";
+}
+
 #yunjingTable {
 	width: 100%;
     font-size: 1.5rem;

@@ -446,15 +446,33 @@ function splitGuangyunDiwei(text) {
 		const weis = Object.keys(weiMap);
 	  
 function searchYunjing(searchText, isSearchText) {
+	let pages = [];
   const yunjingSearch = document.getElementById("yunjingSearch");
   for (let i = 0; i < yunjingData.length; i++) {
     const data = yunjingData[i].split(',');
     if (data[0] === searchText) {
       const page = Number(data[1]);
+	  pages.push(page);
+	  if(!pages.length !== 1){
 	  yunjingSearch.textContent = `${isSearchText ? '' : "【同小韵字】"}${searchText}：${titles[page-1]} ${weis[Number(data[3])-1]} ${data[4]}聲 ${data[5]}韻 ${data[6]}等`;
       displayYunjing(page, searchText);
-      return true;
+	  }
     }
+  }
+  
+  if(pages.length >0){
+	  
+	  pages.forEach((page)=>{
+                const lingjianA = document.createElement("a");
+				lingjianA.textContent = page;
+				lingjianA.href = "javascript:void(0);";
+				
+		  				 lingjianA.addEventListener("click", function () {
+							       displayYunjing(page, searchText);
+    });
+								   yunjingSearch.appendChild(lingjianA);
+	  });
+	  return true;
   }
   yunjingSearch.textContent = "未找到";
   return false;
