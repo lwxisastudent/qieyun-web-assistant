@@ -80,35 +80,12 @@ yunjingDataOri.shift();
 if (yunjingDataOri[yunjingDataOri.length - 1].trim() === '') {
     yunjingDataOri.pop();
 }
-
-  yunjingData = yunjingDataOri.sort((a, b) => {
-	  const pageA = Number(a[1]);
-	  const pageB = Number(b[1]);
-
-      if (pageA < pageB) return -1;
-      if (pageA > pageB) return 1;
-
-      const shengmuA = Number(a[3]);
-      const shengmuB = Number(b[3]);
-
-      if (shengmuA < shengmuB) return -1;
-      if (shengmuA > shengmuB) return 1;
-
-      const toneMap = {
-        '平': 1,
-        '上': 2,
-        '去': 3,
-        '入': 4,
-      };
 	  
-      const toneA = toneMap[a[4]];
-      const toneB = toneMap[b[4]];
-	  
-      if (toneA < toneB) return -1;
-      if (toneA > toneB) return 1;
-
-      return dengMap[a[4]] - dengMap[b[4]];
-    });
+yunjingData = yunjingDataOri.sort((a0,b0) => {
+	const a = a0.split(',');
+	const b = b0.split(',');
+	return Number(a[3]) - Number(b[3]) + (dengMap[a[6]] - dengMap[b[6]])*100 + (toneMap[a[4]] - toneMap[b[4]])*1000 + (Number(a[1]) - Number(b[1]))*10000;
+});
 	
 displayYunjing(currentPage,"");
     }
@@ -408,6 +385,13 @@ function splitGuangyunDiwei(text) {
 
   const titles = ["內轉第一開", "內轉第二開合", "外轉第三開合", "內轉第四開合", "內轉第五合", "內轉第六開", "內轉第七合", "內轉第八開", "內轉第九開", "內轉第十合", "內轉第十一開", "內轉第十二開合", "外轉第十三開", "外轉第十四合", "外轉第十五開", "外轉第十六合", "外轉第十七開", "外轉第十八合", "外轉第十九開", "外轉第二十合", "外轉第二十一開", "外轉第二十二合", "外轉第二十三開", "外轉第二十四合", "外轉第二十五開", "外轉第二十六合", "外轉第二十七合", "內轉第二十八合", "內轉第二十九開", "外轉第三十合", "內轉第三十一開", "內轉第三十二合", "外轉第三十三開", "外轉第三十四合", "外轉第三十五開", "外轉第三十六合", "內轉第三十七開", "內轉第三十八合", "外轉第三十九開", "外轉第四十合", "外轉第四十一合", "內轉第四十二開", "內轉第四十三合"];
   const tones = ['平', '上', '去', '入'];
+  
+      const toneMap = {
+        '平': 1,
+        '上': 2,
+        '去': 3,
+        '入': 4,
+      };
       const dengMap = {
         '一': 1,
         '二': 2,
@@ -437,6 +421,7 @@ currentPage = page;
     updatePageButtons();
 	
   const lines = yunjingData.filter(row => row.split(',')[1] == page);
+  console.log(lines);
 
   const yunjingTitle = document.getElementById("yunjingTitle");
   if(lines.length !== 0 && lines[0].split(',')[2] !== ""){ //开合修正
@@ -454,36 +439,50 @@ currentPage = page;
   yunjingTable.innerHTML = '<thead class="table-rowhead"><tr class="table-rowhead-place"><th></th><th colspan="2">舌齒音</th><th colspan="4">喉音</th><th colspan="5">齒音</th><th colspan="4">牙音</th><th colspan="4">舌音</th><th colspan="4">唇音</th><tr class="table-rowhead-manner"><th></th><th>清濁</th><th>清濁</th><th>清濁</th><th>濁</th><th>清</th><th>清</th><th>濁</th><th>清</th><th>濁</th><th>次清</th><th>清</th><th>清濁</th><th>濁</th><th>次清</th><th>清</th><th>清濁</th><th>濁</th><th>次清</th><th>清</th><th>清濁</th><th>濁</th><th>次清</th><th>清</th></tr></tr></thead>';
 
   const tbody = document.createElement('tbody');
+  let sd,yun;
+  
   for (let i = 0; i < 16; i++) {
+	const contains  = lines.length !== 0 && dengMap[lines[0].split(',')[6]] === i % 4 + 1;
     const tr = document.createElement('tr');
-    if (i % 4 === 0) {
-      tr.className = "table-topline";
-      const sd = document.createElement('td');
-      sd.className = "table-colhead";
-      sd.rowSpan = 4;
-	  if(lines.length !== 0){
-      sd.innerHTML = `<span>${lines[0].split(',')[5]}</span>`;
+	if(i%4 === 0){	
+	tr.className = "table-topline";
+	}
+	else if(!contains || lines[0].split(',')[5] !== yun){
+		sd.rowSpan = sd.rowSpan - 4 + i%4;
+	}
+	
+	if(i % 4 === 0 || (!contains || lines[0].split(',')[5] !== yun)){
+      sd = document.createElement('td');
+      sd.rowSpan = 4 - i % 4;
+	  if(contains){
+      sd.className = "table-colhead-contains";
+		  yun = lines[0].split(',')[5];
+      sd.innerHTML = `<span>${yun}</span>`;
 	  }else{
-		  sd.innerHTML =tones[i/4];
+      sd.className = "table-colhead-uncontains";
+		  yun='';
+		  sd.innerHTML = `<span>${i%4===0 ? tones[i/4] : ""}</span>`;
 	  }
       tr.appendChild(sd);
-    }
+	}
 
     for (let j = 1; j < 24; j++) {
       const cell = document.createElement('td');
-      if (lines.length === 0 || lines[0].split(',')[3] != j || dengMap[lines[0].split(',')[6]] !== i % 4 + 1) {
+      if (lines.length === 0 || lines[0].split(',')[3] != j || !contains) {
         cell.textContent = '◯';
       } else {
         cell.textContent = lines[0].split(',')[0];
 		if(searchText !== "" && searchText === cell.textContent){
 			cell.className="text-match";
 		}
+	  console.log(lines[0]);
         lines.shift();
       }
       tr.appendChild(cell);
     }
 
     tbody.appendChild(tr);
+	  
   }
 
   yunjingTable.appendChild(tbody);

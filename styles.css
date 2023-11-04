@@ -149,10 +149,13 @@ td {
   border-top: 1px solid #ccc;
 }
 
-.table-colhead span {
-	    border-radius: 0.5rem;
+.table-colhead-contains {
+    border-radius: 1rem;
     background-color: gray;
-    padding: 0.1rem 0.3rem;
+}
+
+.table-colhead-uncontains {
+	color: #ccc;
 }
 
 #pagination-container {
